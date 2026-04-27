@@ -1,6 +1,7 @@
 package com.mykhailo.ticket_search.service;
 
 import com.mykhailo.ticket_search.model.Ticket;
+import com.mykhailo.ticket_search.model.TicketSearchResult;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.*;
@@ -18,6 +19,8 @@ public class TicketSearchService {
 
     private static final int MAX_RESULTS = 5;
     private static final int MAX_EDITS = 2;
+    private static final int MIN_WORD_LENGTH = 3;
+    private static final float MIN_SCORE = 1.0f;
 
     private static final String FIELD_NUMBER = "number";
     private static final String FIELD_TITLE = "title";
@@ -29,7 +32,7 @@ public class TicketSearchService {
         this.ticketRepository = ticketRepository;
     }
 
-    public List<Ticket> search(String text) throws Exception {
+    public List<TicketSearchResult> search(String text) throws Exception {
         Analyzer analyzer = new StandardAnalyzer();
         ByteBuffersDirectory index = new ByteBuffersDirectory();
 
@@ -40,7 +43,7 @@ public class TicketSearchService {
         return findTickets(text, index);
     }
 
-    private static List<Ticket> findTickets(String text, ByteBuffersDirectory index) throws IOException {
+    private static List<TicketSearchResult> findTickets(String text, ByteBuffersDirectory index) throws IOException {
         try (DirectoryReader reader = DirectoryReader.open(index)) {
             IndexSearcher searcher = new IndexSearcher(reader);
 
@@ -54,7 +57,7 @@ public class TicketSearchService {
 
             TopDocs results = searcher.search(query, MAX_RESULTS);
 
-            List<Ticket> foundTickets = new ArrayList<>();
+            List<TicketSearchResult> foundTickets = new ArrayList<>();
 
             collectFoundTickets(results, searcher, foundTickets);
 
@@ -62,21 +65,29 @@ public class TicketSearchService {
         }
     }
 
-    private static void collectFoundTickets(TopDocs results, IndexSearcher searcher, List<Ticket> foundTickets) throws IOException {
+    private static void collectFoundTickets(
+            TopDocs results,
+            IndexSearcher searcher,
+            List<TicketSearchResult> foundTickets
+    ) throws IOException {
         for (ScoreDoc scoreDoc : results.scoreDocs) {
             Document doc = searcher.doc(scoreDoc.doc);
 
-            foundTickets.add(new Ticket(
+            Ticket ticket = new Ticket(
                     doc.get(FIELD_NUMBER),
                     doc.get(FIELD_TITLE),
                     doc.get(FIELD_DESCRIPTION)
-            ));
+            );
+
+            if (scoreDoc.score >= MIN_SCORE) {
+                foundTickets.add(new TicketSearchResult(ticket, scoreDoc.score));
+            }
         }
     }
 
     private static void buildSearchQuery(String[] words, BooleanQuery.Builder queryBuilder) {
         for (String word : words) {
-            if (!word.isBlank()) {
+            if (!word.isBlank() && word.length() >= MIN_WORD_LENGTH) {
                 queryBuilder.add(
                         new PrefixQuery(new Term(FIELD_TITLE, word)),
                         BooleanClause.Occur.SHOULD
