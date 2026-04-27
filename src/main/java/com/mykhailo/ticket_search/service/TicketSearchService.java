@@ -16,8 +16,14 @@ import java.util.List;
 @Service
 public class TicketSearchService {
 
-    private final TicketRepository ticketRepository;
+    private static final int MAX_RESULTS = 5;
     private static final int MAX_EDITS = 2;
+
+    private static final String FIELD_NUMBER = "number";
+    private static final String FIELD_TITLE = "title";
+    private static final String FIELD_DESCRIPTION = "description";
+
+    private final TicketRepository ticketRepository;
 
     public TicketSearchService(TicketRepository ticketRepository) {
         this.ticketRepository = ticketRepository;
@@ -46,7 +52,7 @@ public class TicketSearchService {
 
             Query query = queryBuilder.build();
 
-            TopDocs results = searcher.search(query, 2);
+            TopDocs results = searcher.search(query, MAX_RESULTS);
 
             List<Ticket> foundTickets = new ArrayList<>();
 
@@ -61,9 +67,9 @@ public class TicketSearchService {
             Document doc = searcher.doc(scoreDoc.doc);
 
             foundTickets.add(new Ticket(
-                    doc.get("number"),
-                    doc.get("title"),
-                    doc.get("description")
+                    doc.get(FIELD_NUMBER),
+                    doc.get(FIELD_TITLE),
+                    doc.get(FIELD_DESCRIPTION)
             ));
         }
     }
@@ -72,21 +78,21 @@ public class TicketSearchService {
         for (String word : words) {
             if (!word.isBlank()) {
                 queryBuilder.add(
-                        new PrefixQuery(new Term("title", word)),
+                        new PrefixQuery(new Term(FIELD_TITLE, word)),
                         BooleanClause.Occur.SHOULD
                 );
 
                 queryBuilder.add(
-                        new PrefixQuery(new Term("description", word)),
+                        new PrefixQuery(new Term(FIELD_DESCRIPTION, word)),
                         BooleanClause.Occur.SHOULD
                 );
                 queryBuilder.add(
-                        new FuzzyQuery(new Term("title", word), MAX_EDITS),
+                        new FuzzyQuery(new Term(FIELD_TITLE, word), MAX_EDITS),
                         BooleanClause.Occur.SHOULD
                 );
 
                 queryBuilder.add(
-                        new FuzzyQuery(new Term("description", word), MAX_EDITS),
+                        new FuzzyQuery(new Term(FIELD_DESCRIPTION, word), MAX_EDITS),
                         BooleanClause.Occur.SHOULD
                 );
             }
@@ -98,9 +104,9 @@ public class TicketSearchService {
             for (Ticket ticket : ticketRepository.findAll()) {
                 Document doc = new Document();
 
-                doc.add(new StringField("number", ticket.number(), Field.Store.YES));
-                doc.add(new TextField("title", ticket.title(), Field.Store.YES));
-                doc.add(new TextField("description", ticket.description(), Field.Store.YES));
+                doc.add(new StringField(FIELD_NUMBER, ticket.number(), Field.Store.YES));
+                doc.add(new TextField(FIELD_TITLE, ticket.title(), Field.Store.YES));
+                doc.add(new TextField(FIELD_DESCRIPTION, ticket.description(), Field.Store.YES));
 
                 writer.addDocument(doc);
             }
