@@ -11,6 +11,7 @@ import org.apache.lucene.store.ByteBuffersDirectory;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +26,7 @@ public class TicketSearchService {
     private static final String FIELD_NUMBER = "number";
     private static final String FIELD_TITLE = "title";
     private static final String FIELD_DESCRIPTION = "description";
+    private static final String FIELD_CLOSED_DATE = "closedDate";
 
     private final TicketRepository ticketRepository;
 
@@ -76,7 +78,8 @@ public class TicketSearchService {
             Ticket ticket = new Ticket(
                     doc.get(FIELD_NUMBER),
                     doc.get(FIELD_TITLE),
-                    doc.get(FIELD_DESCRIPTION)
+                    doc.get(FIELD_DESCRIPTION),
+                    LocalDate.parse(doc.get(FIELD_CLOSED_DATE))
             );
 
             if (scoreDoc.score >= MIN_SCORE) {
@@ -118,6 +121,7 @@ public class TicketSearchService {
                 doc.add(new StringField(FIELD_NUMBER, ticket.number(), Field.Store.YES));
                 doc.add(new TextField(FIELD_TITLE, ticket.title(), Field.Store.YES));
                 doc.add(new TextField(FIELD_DESCRIPTION, ticket.description(), Field.Store.YES));
+                doc.add(new TextField(FIELD_CLOSED_DATE, ticket.closedDate().toString(), Field.Store.YES));
 
                 writer.addDocument(doc);
             }
