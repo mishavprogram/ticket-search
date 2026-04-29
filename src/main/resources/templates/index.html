@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Ticket Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+
+        .header {
+            background-color: #222;
+            color: white;
+            padding: 10px 20px;
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 20px auto;
+            padding: 0 16px;
+        }
+
+        input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 8px;
+        }
+
+        button {
+            margin-top: 10px;
+            padding: 6px 12px;
+        }
+
+        p {
+            overflow-wrap: break-word;
+            word-break: break-word;
+            white-space: normal;
+        }
+
+        .ticket-description {
+            max-height: 60px;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="header">
+    Created by Mykhailo Vinnichuk (personal tool)
+</div>
+
+<div class="container">
+
+    <h2>Search tickets</h2>
+
+    <form action="/search-ui" method="get">
+        <input type="text" name="text" th:value="${query}" placeholder="Введи проблему..."/>
+        <button type="submit">Search</button>
+    </form>
+
+    <div>
+        <h3 th:if="${results != null}">
+            Results for "<span th:text="${query}"></span>" —
+            <span th:text="${results.size()}"></span> found
+        </h3>
+
+        <div th:if="${results != null}">
+            <div th:each="r : ${results}">
+                <p>
+                    <b th:text="${r.ticket.number}"></b> —
+                    <b th:text="${r.ticket.title}"></b>
+                </p>
+
+                <p class="ticket-description"
+                   th:text="${#strings.abbreviate(r.ticket.description, 120)}">
+                </p>
+
+                <p>Score: <span th:text="${r.score}"></span></p>
+
+                <hr/>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
