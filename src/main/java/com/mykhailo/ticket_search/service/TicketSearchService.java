@@ -27,12 +27,12 @@ public class TicketSearchService {
     private static final int MAX_RESULTS = 5;
     private static final int MAX_EDITS = 2;
     private static final int MIN_WORD_LENGTH = 3;
-    private static final float MIN_SCORE = 1.0f;
 
     private static final String FIELD_NUMBER = "number";
     private static final String FIELD_TITLE = "title";
     private static final String FIELD_DESCRIPTION = "description";
     private static final String FIELD_CLOSED_DATE = "closedDate";
+    private static final float MIN_SCORE_RATIO = 0.5f;
 
     private final TicketRepository ticketRepository;
 
@@ -78,7 +78,18 @@ public class TicketSearchService {
             IndexSearcher searcher,
             List<TicketSearchResult> foundTickets
     ) throws IOException {
+        if (results.scoreDocs.length == 0) {
+            return;
+        }
+
+        float topScore = results.scoreDocs[0].score;
+        float minAllowedScore = topScore * MIN_SCORE_RATIO;
+
         for (ScoreDoc scoreDoc : results.scoreDocs) {
+            if (scoreDoc.score < minAllowedScore) {
+                continue;
+            }
+
             Document doc = searcher.doc(scoreDoc.doc);
 
             Ticket ticket = new Ticket(
@@ -88,9 +99,7 @@ public class TicketSearchService {
                     LocalDate.parse(doc.get(FIELD_CLOSED_DATE))
             );
 
-            if (scoreDoc.score >= MIN_SCORE) {
-                foundTickets.add(new TicketSearchResult(ticket, scoreDoc.score));
-            }
+            foundTickets.add(new TicketSearchResult(ticket, scoreDoc.score));
         }
     }
 
