@@ -40,8 +40,14 @@
         }
 
         .ticket-description {
-            max-height: 60px;
-            overflow: hidden;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            white-space: normal;
+        }
+
+        mark {
+            background-color: yellow;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -74,9 +80,7 @@
                     <b th:text="${r.ticket.title}"></b>
                 </p>
 
-                <p class="ticket-description"
-                   th:text="${#strings.abbreviate(r.ticket.description, 120)}">
-                </p>
+                <p class="ticket-description" th:text="${r.ticket.description}"></p>
 
                 <p>Score: <span th:text="${r.score}"></span></p>
 
@@ -86,6 +90,31 @@
     </div>
 
 </div>
+
+<script>
+    const params = new URLSearchParams(window.location.search);
+    const query = params.get("text");
+
+    if (query) {
+        const words = query
+            .toLowerCase()
+            .split(/\s+/)
+            .filter(word => word.length >= 3);
+
+        document.querySelectorAll(".ticket-description").forEach(element => {
+            let text = element.textContent;
+
+            words.forEach(word => {
+                const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+                const regex = new RegExp("(" + escapedWord + ")", "gi");
+
+                text = text.replace(regex, "<mark>$1</mark>");
+            });
+
+            element.innerHTML = text;
+        });
+    }
+</script>
 
 </body>
 </html>
