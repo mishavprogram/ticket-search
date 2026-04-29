@@ -31,3 +31,10 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### DB ###
+/data/*
+!/data/.gitkeep
+*.db
+*.db-shm
+*.db-wal

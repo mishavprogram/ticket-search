@@ -2,6 +2,7 @@ package com.mykhailo.ticket_search.service;
 
 import com.mykhailo.ticket_search.model.Ticket;
 import com.mykhailo.ticket_search.model.TicketSearchResult;
+import com.mykhailo.ticket_search.repository.TicketRepository;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -12,7 +13,14 @@ import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.search.*;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.FuzzyQuery;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.PrefixQuery;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.ByteBuffersDirectory;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +43,7 @@ public class TicketSearchService {
     private static final float MIN_SCORE_RATIO = 0.5f;
 
     private final TicketRepository ticketRepository;
+    ;
 
     public TicketSearchService(TicketRepository ticketRepository) {
         this.ticketRepository = ticketRepository;
