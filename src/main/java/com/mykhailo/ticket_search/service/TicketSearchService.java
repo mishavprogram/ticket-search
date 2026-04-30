@@ -1,5 +1,6 @@
 package com.mykhailo.ticket_search.service;
 
+import com.mykhailo.ticket_search.config.SearchSettings;
 import com.mykhailo.ticket_search.model.Ticket;
 import com.mykhailo.ticket_search.model.TicketSearchResult;
 import com.mykhailo.ticket_search.repository.TicketRepository;
@@ -32,18 +33,13 @@ import java.util.List;
 @Service
 public class TicketSearchService {
 
-    private static final int MAX_RESULTS = 5;
-    private static final int MAX_EDITS = 2;
-    private static final int MIN_WORD_LENGTH = 3;
-
     private static final String FIELD_NUMBER = "number";
     private static final String FIELD_TITLE = "title";
     private static final String FIELD_DESCRIPTION = "description";
     private static final String FIELD_CLOSED_DATE = "closedDate";
-    private static final float MIN_SCORE_RATIO = 0.5f;
 
     private final TicketRepository ticketRepository;
-    ;
+    private final SearchSettings searchSettings = SearchSettings.defaultSettings();
 
     public TicketSearchService(TicketRepository ticketRepository) {
         this.ticketRepository = ticketRepository;
@@ -60,7 +56,7 @@ public class TicketSearchService {
         return findTickets(text, index);
     }
 
-    private static List<TicketSearchResult> findTickets(String text, ByteBuffersDirectory index) throws IOException {
+    private List<TicketSearchResult> findTickets(String text, ByteBuffersDirectory index) throws IOException {
         try (DirectoryReader reader = DirectoryReader.open(index)) {
             IndexSearcher searcher = new IndexSearcher(reader);
 
@@ -72,7 +68,7 @@ public class TicketSearchService {
 
             Query query = queryBuilder.build();
 
-            TopDocs results = searcher.search(query, MAX_RESULTS);
+            TopDocs results = searcher.search(query, searchSettings.maxResults());
 
             List<TicketSearchResult> foundTickets = new ArrayList<>();
 
@@ -82,7 +78,7 @@ public class TicketSearchService {
         }
     }
 
-    private static void collectFoundTickets(
+    private void collectFoundTickets(
             TopDocs results,
             IndexSearcher searcher,
             List<TicketSearchResult> foundTickets
@@ -92,7 +88,7 @@ public class TicketSearchService {
         }
 
         float topScore = results.scoreDocs[0].score;
-        float minAllowedScore = topScore * MIN_SCORE_RATIO;
+        float minAllowedScore = topScore * searchSettings.minScoreRatio();
 
         for (ScoreDoc scoreDoc : results.scoreDocs) {
             if (scoreDoc.score < minAllowedScore) {
@@ -112,9 +108,9 @@ public class TicketSearchService {
         }
     }
 
-    private static void buildSearchQuery(String[] words, BooleanQuery.Builder queryBuilder) {
+    private void buildSearchQuery(String[] words, BooleanQuery.Builder queryBuilder) {
         for (String word : words) {
-            if (!word.isBlank() && word.length() >= MIN_WORD_LENGTH) {
+            if (!word.isBlank() && word.length() >= searchSettings.minWordLength()) {
                 queryBuilder.add(
                         new PrefixQuery(new Term(FIELD_TITLE, word)),
                         BooleanClause.Occur.SHOULD
@@ -125,12 +121,12 @@ public class TicketSearchService {
                         BooleanClause.Occur.SHOULD
                 );
                 queryBuilder.add(
-                        new FuzzyQuery(new Term(FIELD_TITLE, word), MAX_EDITS),
+                        new FuzzyQuery(new Term(FIELD_TITLE, word), searchSettings.maxEdits()),
                         BooleanClause.Occur.SHOULD
                 );
 
                 queryBuilder.add(
-                        new FuzzyQuery(new Term(FIELD_DESCRIPTION, word), MAX_EDITS),
+                        new FuzzyQuery(new Term(FIELD_DESCRIPTION, word), searchSettings.maxEdits()),
                         BooleanClause.Occur.SHOULD
                 );
             }
@@ -145,7 +141,7 @@ public class TicketSearchService {
                 doc.add(new StringField(FIELD_NUMBER, ticket.number(), Field.Store.YES));
                 doc.add(new TextField(FIELD_TITLE, ticket.title(), Field.Store.YES));
                 doc.add(new TextField(FIELD_DESCRIPTION, ticket.description(), Field.Store.YES));
-                doc.add(new TextField(FIELD_CLOSED_DATE, ticket.closedDate().toString(), Field.Store.YES));
+                doc.add(new StringField(FIELD_CLOSED_DATE, ticket.closedDate().toString(), Field.Store.YES));
 
                 writer.addDocument(doc);
             }
