@@ -21,6 +21,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.ByteBuffersDirectory;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class TicketSearchService {
@@ -39,6 +41,16 @@ public class TicketSearchService {
     private static final String FIELD_CLOSED_DATE = "closedDate";
 
     private final TicketRepository ticketRepository;
+
+    private static final Set<String> ALLOWED_SHORT_WORDS = Set.of(
+            "ai",
+            "ui",
+            "id",
+            "sql",
+            "crm",
+            "api",
+            "db"
+    );
 
     public TicketSearchService(TicketRepository ticketRepository) {
         this.ticketRepository = ticketRepository;
@@ -112,25 +124,55 @@ public class TicketSearchService {
         }
     }
 
-    private void buildSearchQuery(String[] words, BooleanQuery.Builder queryBuilder, SearchSettings settings) {
+    private void buildSearchQuery(String[] words,
+                                  BooleanQuery.Builder queryBuilder,
+                                  SearchSettings settings) {
+
         for (String word : words) {
-            if (!word.isBlank() && word.length() >= settings.minWordLength()) {
+
+            String normalized = word.toLowerCase();
+
+            if (normalized.isBlank()) {
+                continue;
+            }
+
+            boolean isAllowedShortWord = ALLOWED_SHORT_WORDS.contains(normalized);
+
+            // 🔹 short words
+            if (isAllowedShortWord) {
                 queryBuilder.add(
-                        new PrefixQuery(new Term(FIELD_TITLE, word)),
+                        new TermQuery(new Term(FIELD_TITLE, normalized)),
                         BooleanClause.Occur.SHOULD
                 );
 
                 queryBuilder.add(
-                        new PrefixQuery(new Term(FIELD_DESCRIPTION, word)),
+                        new TermQuery(new Term(FIELD_DESCRIPTION, normalized)),
                         BooleanClause.Occur.SHOULD
                 );
+
+                continue;
+            }
+
+            // 🔹 Regular words
+            if (normalized.length() >= settings.minWordLength()) {
+
                 queryBuilder.add(
-                        new FuzzyQuery(new Term(FIELD_TITLE, word), settings.maxEdits()),
+                        new PrefixQuery(new Term(FIELD_TITLE, normalized)),
                         BooleanClause.Occur.SHOULD
                 );
 
                 queryBuilder.add(
-                        new FuzzyQuery(new Term(FIELD_DESCRIPTION, word), settings.maxEdits()),
+                        new PrefixQuery(new Term(FIELD_DESCRIPTION, normalized)),
+                        BooleanClause.Occur.SHOULD
+                );
+
+                queryBuilder.add(
+                        new FuzzyQuery(new Term(FIELD_TITLE, normalized), settings.maxEdits()),
+                        BooleanClause.Occur.SHOULD
+                );
+
+                queryBuilder.add(
+                        new FuzzyQuery(new Term(FIELD_DESCRIPTION, normalized), settings.maxEdits()),
                         BooleanClause.Occur.SHOULD
                 );
             }

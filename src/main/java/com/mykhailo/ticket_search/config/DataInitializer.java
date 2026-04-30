@@ -86,23 +86,23 @@ public class DataInitializer implements CommandLineRunner {
 
         ticketJpaRepository.save(new TicketEntity(
                 "MVP-09",
-                "Новий ноут",
-                "Хочу собі якийсь Lenovo Legion під мій монітор Full HD 200 ГЦ. Порадьте будь ласка",
+                "Новий ноут ai",
+                "Хочу собі якийсь Lenovo Legion під мій монітор Full HD 200 ГЦ. Порадьте будь ласка. Хочу відчути аі сучасне",
                 LocalDate.of(2026, 4, 11)
         ));
 
 
         ticketJpaRepository.save(new TicketEntity(
                 "MVP-10",
-                "Апгрейд ноута",
-                "Чи можна зробити якісь апрейди для мого ноута? Lenovo Legion. Процесор AMD Rysen 7. Хочу приріст FPS під Full HD",
+                "Апгрейд ноута sql",
+                "Чи можна зробити якісь апрейди для мого ноута? Lenovo Legion. Процесор AMD Rysen 7. Хочу приріст FPS під Full HD. Бажано без AI",
                 LocalDate.of(2026, 4, 11)
         ));
 
 
         ticketJpaRepository.save(new TicketEntity(
                 "MVP-11",
-                "Ноут тупить",
+                "Ноут тупить crm",
                 "Раніше було 200 FPS в CS2, зараз 50. Є підозра що використовується інтегрована відеокарта, а не дискретна. Lenovo Legion 7 FY9790",
                 LocalDate.of(2026, 4, 11)
         ));
