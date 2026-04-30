@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Add Ticket</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+
+        .header {
+            background-color: #222;
+            color: white;
+            padding: 10px 20px;
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 20px auto;
+            padding: 0 16px;
+        }
+
+        input, textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 6px 12px;
+        }
+
+        a {
+            margin-left: 10px;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="header">
+    Created by Mykhailo Vinnichuk (personal tool)
+</div>
+
+<div class="container">
+
+    <h2>Add ticket</h2>
+
+    <form action="/add-ticket" method="post">
+        <label>Ticket number:</label>
+        <input type="text" name="number" required placeholder="Наприклад: 42049"/>
+
+        <label>Title:</label>
+        <input type="text" name="title" required placeholder="Коротка назва тікета"/>
+
+        <label>Description:</label>
+        <textarea name="description" required placeholder="Текст звернення..." rows="10"></textarea>
+
+        <br><br>
+
+        <button type="submit">Save</button>
+        <a href="/">Back to search</a>
+    </form>
+
+</div>
+
+</body>
+</html>

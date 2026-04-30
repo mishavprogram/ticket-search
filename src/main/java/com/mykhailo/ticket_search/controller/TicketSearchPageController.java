@@ -1,22 +1,28 @@
 package com.mykhailo.ticket_search.controller;
 
 import com.mykhailo.ticket_search.config.SearchSettings;
+import com.mykhailo.ticket_search.model.TicketEntity;
 import com.mykhailo.ticket_search.model.TicketSearchResult;
+import com.mykhailo.ticket_search.repository.TicketJpaRepository;
 import com.mykhailo.ticket_search.service.TicketSearchService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Controller
 public class TicketSearchPageController {
 
     private final TicketSearchService ticketSearchService;
+    private final TicketJpaRepository ticketJpaRepository;
 
-    public TicketSearchPageController(TicketSearchService ticketSearchService) {
+    public TicketSearchPageController(TicketSearchService ticketSearchService, TicketJpaRepository ticketJpaRepository) {
         this.ticketSearchService = ticketSearchService;
+        this.ticketJpaRepository = ticketJpaRepository;
     }
 
     @GetMapping("/")
@@ -47,5 +53,31 @@ public class TicketSearchPageController {
         model.addAttribute("settings", settings);
 
         return "index";
+    }
+
+    @GetMapping("/add-ticket")
+    public String addTicketPage() {
+        return "add-ticket";
+    }
+
+    @PostMapping("/add-ticket")
+    public String addTicket(
+            @RequestParam String number,
+            @RequestParam String title,
+            @RequestParam String description
+    ) {
+
+        if (ticketJpaRepository.existsByNumber(number)) {
+            return "redirect:/add-ticket?error=exists";//TODO: show user-friendly duplicate ticket error on UI
+        }
+
+        ticketJpaRepository.save(new TicketEntity(
+                number,
+                title,
+                description,
+                LocalDate.now()
+        ));
+
+        return "redirect:/";
     }
 }
