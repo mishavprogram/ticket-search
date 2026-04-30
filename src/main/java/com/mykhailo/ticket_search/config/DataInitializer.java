@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 
-@Component
+//@Component
 public class DataInitializer implements CommandLineRunner {
 
     private final TicketJpaRepository ticketJpaRepository;
