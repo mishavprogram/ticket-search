@@ -64,7 +64,8 @@ public class TicketSearchPageController {
     public String addTicket(
             @RequestParam String number,
             @RequestParam String title,
-            @RequestParam String description
+            @RequestParam String description,
+            @RequestParam LocalDate closedDate
     ) {
 
         if (ticketJpaRepository.existsByNumber(number)) {
@@ -75,7 +76,7 @@ public class TicketSearchPageController {
                 number,
                 title,
                 description,
-                LocalDate.now()
+                closedDate
         ));
 
         return "redirect:/";
