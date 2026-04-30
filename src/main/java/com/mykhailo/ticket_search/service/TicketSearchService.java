@@ -39,13 +39,12 @@ public class TicketSearchService {
     private static final String FIELD_CLOSED_DATE = "closedDate";
 
     private final TicketRepository ticketRepository;
-    private final SearchSettings searchSettings = SearchSettings.defaultSettings();
 
     public TicketSearchService(TicketRepository ticketRepository) {
         this.ticketRepository = ticketRepository;
     }
 
-    public List<TicketSearchResult> search(String text) throws Exception {
+    public List<TicketSearchResult> search(String text, SearchSettings settings) throws Exception {
         Analyzer analyzer = new StandardAnalyzer();
         ByteBuffersDirectory index = new ByteBuffersDirectory();
 
@@ -53,10 +52,14 @@ public class TicketSearchService {
 
         createIndex(index, config);
 
-        return findTickets(text, index);
+        return findTickets(text, index, settings);
     }
 
-    private List<TicketSearchResult> findTickets(String text, ByteBuffersDirectory index) throws IOException {
+    public List<TicketSearchResult> search(String text) throws Exception {
+        return search(text, SearchSettings.defaultSettings());
+    }
+
+    private List<TicketSearchResult> findTickets(String text, ByteBuffersDirectory index, SearchSettings settings) throws IOException {
         try (DirectoryReader reader = DirectoryReader.open(index)) {
             IndexSearcher searcher = new IndexSearcher(reader);
 
@@ -64,15 +67,15 @@ public class TicketSearchService {
 
             String[] words = text.toLowerCase().split("\\s+");
 
-            buildSearchQuery(words, queryBuilder);
+            buildSearchQuery(words, queryBuilder, settings);
 
             Query query = queryBuilder.build();
 
-            TopDocs results = searcher.search(query, searchSettings.maxResults());
+            TopDocs results = searcher.search(query, settings.maxResults());
 
             List<TicketSearchResult> foundTickets = new ArrayList<>();
 
-            collectFoundTickets(results, searcher, foundTickets);
+            collectFoundTickets(results, searcher, foundTickets, settings);
 
             return foundTickets;
         }
@@ -81,14 +84,15 @@ public class TicketSearchService {
     private void collectFoundTickets(
             TopDocs results,
             IndexSearcher searcher,
-            List<TicketSearchResult> foundTickets
+            List<TicketSearchResult> foundTickets,
+            SearchSettings settings
     ) throws IOException {
         if (results.scoreDocs.length == 0) {
             return;
         }
 
         float topScore = results.scoreDocs[0].score;
-        float minAllowedScore = topScore * searchSettings.minScoreRatio();
+        float minAllowedScore = topScore * settings.minScoreRatio();
 
         for (ScoreDoc scoreDoc : results.scoreDocs) {
             if (scoreDoc.score < minAllowedScore) {
@@ -108,9 +112,9 @@ public class TicketSearchService {
         }
     }
 
-    private void buildSearchQuery(String[] words, BooleanQuery.Builder queryBuilder) {
+    private void buildSearchQuery(String[] words, BooleanQuery.Builder queryBuilder, SearchSettings settings) {
         for (String word : words) {
-            if (!word.isBlank() && word.length() >= searchSettings.minWordLength()) {
+            if (!word.isBlank() && word.length() >= settings.minWordLength()) {
                 queryBuilder.add(
                         new PrefixQuery(new Term(FIELD_TITLE, word)),
                         BooleanClause.Occur.SHOULD
@@ -121,12 +125,12 @@ public class TicketSearchService {
                         BooleanClause.Occur.SHOULD
                 );
                 queryBuilder.add(
-                        new FuzzyQuery(new Term(FIELD_TITLE, word), searchSettings.maxEdits()),
+                        new FuzzyQuery(new Term(FIELD_TITLE, word), settings.maxEdits()),
                         BooleanClause.Occur.SHOULD
                 );
 
                 queryBuilder.add(
-                        new FuzzyQuery(new Term(FIELD_DESCRIPTION, word), searchSettings.maxEdits()),
+                        new FuzzyQuery(new Term(FIELD_DESCRIPTION, word), settings.maxEdits()),
                         BooleanClause.Occur.SHOULD
                 );
             }

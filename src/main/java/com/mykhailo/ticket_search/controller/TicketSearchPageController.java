@@ -1,5 +1,6 @@
 package com.mykhailo.ticket_search.controller;
 
+import com.mykhailo.ticket_search.config.SearchSettings;
 import com.mykhailo.ticket_search.model.TicketSearchResult;
 import com.mykhailo.ticket_search.service.TicketSearchService;
 import org.springframework.stereotype.Controller;
@@ -24,11 +25,26 @@ public class TicketSearchPageController {
     }
 
     @GetMapping("/search-ui")
-    public String search(@RequestParam String text, Model model) throws Exception {
-        List<TicketSearchResult> results = ticketSearchService.search(text);
+    public String search(
+            @RequestParam String text,
+            @RequestParam(defaultValue = "5") int maxResults,
+            @RequestParam(defaultValue = "2") int maxEdits,
+            @RequestParam(defaultValue = "3") int minWordLength,
+            @RequestParam(defaultValue = "0.5") float minScoreRatio,
+            Model model
+    ) throws Exception {
+        SearchSettings settings = SearchSettings.of(
+                maxResults,
+                maxEdits,
+                minWordLength,
+                minScoreRatio
+        );
+
+        List<TicketSearchResult> results = ticketSearchService.search(text, settings);
 
         model.addAttribute("query", text);
         model.addAttribute("results", results);
+        model.addAttribute("settings", settings);
 
         return "index";
     }
