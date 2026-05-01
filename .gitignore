@@ -35,6 +35,8 @@ build/
 ### DB ###
 /data/*
 !/data/.gitkeep
+data/
+config/
 *.db
 *.db-shm
 *.db-wal

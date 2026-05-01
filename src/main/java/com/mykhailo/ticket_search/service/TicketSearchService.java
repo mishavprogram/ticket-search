@@ -1,5 +1,6 @@
 package com.mykhailo.ticket_search.service;
 
+import com.mykhailo.ticket_search.config.AllowedShortWordsProvider;
 import com.mykhailo.ticket_search.config.SearchSettings;
 import com.mykhailo.ticket_search.model.Ticket;
 import com.mykhailo.ticket_search.model.TicketSearchResult;
@@ -30,7 +31,6 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class TicketSearchService {
@@ -41,19 +41,11 @@ public class TicketSearchService {
     private static final String FIELD_CLOSED_DATE = "closedDate";
 
     private final TicketRepository ticketRepository;
+    private final AllowedShortWordsProvider allowedShortWordsProvider;
 
-    private static final Set<String> ALLOWED_SHORT_WORDS = Set.of(
-            "ai",
-            "ui",
-            "id",
-            "sql",
-            "crm",
-            "api",
-            "db"
-    );
-
-    public TicketSearchService(TicketRepository ticketRepository) {
+    public TicketSearchService(TicketRepository ticketRepository, AllowedShortWordsProvider allowedShortWordsProvider) {
         this.ticketRepository = ticketRepository;
+        this.allowedShortWordsProvider = allowedShortWordsProvider;
     }
 
     public List<TicketSearchResult> search(String text, SearchSettings settings) throws Exception {
@@ -136,7 +128,9 @@ public class TicketSearchService {
                 continue;
             }
 
-            boolean isAllowedShortWord = ALLOWED_SHORT_WORDS.contains(normalized);
+            boolean isAllowedShortWord = allowedShortWordsProvider
+                    .getAllowedShortWords()
+                    .contains(normalized);
 
             // 🔹 short words
             if (isAllowedShortWord) {
