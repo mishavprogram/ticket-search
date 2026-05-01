@@ -51,6 +51,14 @@
 
     <h2>Add ticket</h2>
 
+    <p style="color: green;" th:if="${param.success}">
+        Ticket added successfully.
+    </p>
+
+    <p style="color: red;" th:if="${param.error == 'exists'}">
+        Ticket with this number already exists.
+    </p>
+
     <form action="/add-ticket" method="post">
         <label>Ticket number:</label>
         <input type="text" name="number" required placeholder="Наприклад: 42049"/>

@@ -79,6 +79,6 @@ public class TicketSearchPageController {
                 closedDate
         ));
 
-        return "redirect:/";
+        return "redirect:/add-ticket?success=true";
     }
 }
