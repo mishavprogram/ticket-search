@@ -36,7 +36,8 @@ public class TicketSearchPageController {
             @RequestParam(defaultValue = "5") int maxResults,
             @RequestParam(defaultValue = "2") int maxEdits,
             @RequestParam(defaultValue = "3") int minWordLength,
-            @RequestParam(defaultValue = "0.5") float minScoreRatio,
+            @RequestParam(defaultValue = "0.0") float minScoreRatio,//TODO find correct default value
+            @RequestParam(defaultValue = "") String originalWebSite,
             Model model
     ) throws Exception {
         SearchSettings settings = SearchSettings.of(
@@ -48,9 +49,17 @@ public class TicketSearchPageController {
 
         List<TicketSearchResult> results = ticketSearchService.search(text, settings);
 
+        List<UiSearchResult> uiResults = results.stream()
+                .map(result -> new UiSearchResult(
+                        result,
+                        buildTicketUrl(originalWebSite, result.ticket().number())
+                ))
+                .toList();
+
         model.addAttribute("query", text);
-        model.addAttribute("results", results);
+        model.addAttribute("results", uiResults);
         model.addAttribute("settings", settings);
+        model.addAttribute("originalWebSite", originalWebSite);
 
         return "index";
     }
@@ -67,7 +76,6 @@ public class TicketSearchPageController {
             @RequestParam String description,
             @RequestParam LocalDate closedDate
     ) {
-
         if (ticketJpaRepository.existsByNumber(number)) {
             return "redirect:/add-ticket?error=duplicate";
         }
@@ -80,5 +88,19 @@ public class TicketSearchPageController {
         ));
 
         return "redirect:/add-ticket?success=true";
+    }
+
+    private String buildTicketUrl(String originalWebSite, String number) {
+        if (originalWebSite == null || originalWebSite.isBlank()) {
+            return "";
+        }
+
+        return originalWebSite + number;
+    }
+
+    public record UiSearchResult(
+            TicketSearchResult result,
+            String url
+    ) {
     }
 }

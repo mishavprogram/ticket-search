@@ -12,7 +12,7 @@ public record SearchSettings(
                 5,
                 2,
                 3,
-                0.5f
+                0.0f
         );
     }
 

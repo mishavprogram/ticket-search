@@ -36,18 +36,21 @@
         p {
             overflow-wrap: break-word;
             word-break: break-word;
-            white-space: normal;
         }
 
         .ticket-description {
             overflow-wrap: break-word;
             word-break: break-word;
-            white-space: normal;
         }
 
         mark {
             background-color: yellow;
             font-weight: bold;
+        }
+
+        a.ticket-link {
+            color: blue;
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -67,12 +70,19 @@
 
         <br><br>
 
+        <label>Original web site:</label>
+        <input type="text" name="originalWebSite"
+               th:value="${originalWebSite}"
+               placeholder="Paste full ticket URL here"/>
+
+        <br><br>
+
         <label>Max results:</label>
         <input type="number" name="maxResults"
                th:value="${settings != null ? settings.maxResults : 5}"
                min="1" max="20"/>
 
-        <label>Max edits:</label>
+        <label>Max edits (0–2, Lucene limit):</label>
         <input type="number" name="maxEdits"
                th:value="${settings != null ? settings.maxEdits : 2}"
                min="0" max="2"/>
@@ -84,7 +94,7 @@
 
         <label>Min score ratio:</label>
         <input type="number" step="0.1" name="minScoreRatio"
-               th:value="${settings != null ? settings.minScoreRatio : 0.5}"
+               th:value="${settings != null ? settings.minScoreRatio : 0.0}"
                min="0" max="1"/>
 
         <button type="submit">Search</button>
@@ -99,13 +109,25 @@
         <div th:if="${results != null}">
             <div th:each="r : ${results}">
                 <p>
-                    <b th:text="${r.ticket.number}"></b> —
-                    <b th:text="${r.ticket.title}"></b>
+                    <a class="ticket-link"
+                       th:if="${r.url != null and !r.url.isBlank()}"
+                       th:href="${r.url}"
+                       th:text="${r.result.ticket.number}"
+                       target="_blank">
+                    </a>
+
+                    <b th:if="${r.url == null or r.url.isBlank()}"
+                       th:text="${r.result.ticket.number}">
+                    </b>
+
+                    —
+                    <b th:text="${r.result.ticket.title}"></b>
                 </p>
 
-                <p class="ticket-description" th:text="${r.ticket.description}"></p>
+                <p class="ticket-description"
+                   th:text="${r.result.ticket.description}"></p>
 
-                <p>Score: <span th:text="${r.score}"></span></p>
+                <p>Score: <span th:text="${r.result.score}"></span></p>
 
                 <hr/>
             </div>
