@@ -65,6 +65,11 @@
 
     <h2>Search tickets</h2>
 
+    <p style="font-size: 13px; color: #555;">
+        Search priority: <b>important words</b> > title > description.
+        Use short, meaningful keywords for best results.
+    </p>
+
     <form action="/search-ui" method="get">
         <input type="text" name="text" th:value="${query}" placeholder="Введи проблему..."/>
 
