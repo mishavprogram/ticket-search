@@ -69,7 +69,7 @@ public class TicketSearchPageController {
     ) {
 
         if (ticketJpaRepository.existsByNumber(number)) {
-            return "redirect:/add-ticket?error=exists";//TODO: show user-friendly duplicate ticket error on UI
+            return "redirect:/add-ticket?error=duplicate";
         }
 
         ticketJpaRepository.save(new TicketEntity(

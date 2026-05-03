@@ -51,12 +51,12 @@
 
     <h2>Add ticket</h2>
 
-    <p style="color: green;" th:if="${param.success}">
-        Ticket added successfully.
+    <p style="color: red;" th:if="${param.error != null}">
+        Ticket with this number already exists.
     </p>
 
-    <p style="color: red;" th:if="${param.error == 'exists'}">
-        Ticket with this number already exists.
+    <p style="color: green;" th:if="${param.success != null}">
+        Ticket added successfully.
     </p>
 
     <form action="/add-ticket" method="post">
