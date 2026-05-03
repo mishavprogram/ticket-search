@@ -26,21 +26,24 @@ public class DataInitializer implements CommandLineRunner {
                 "MVP-01",
                 "Тестовий тікет",
                 "Це перший тестовий тікет у базі SQLite.",
-                LocalDate.of(2026, 4, 29)
+                LocalDate.of(2026, 4, 29),
+                ""
         ));
 
         ticketJpaRepository.save(new TicketEntity(
                 "MVP-02",
                 "Тема",
                 "Доброго дня, колеги! Просто тестую роботу цього сайту. Дякую",
-                LocalDate.of(2026, 3, 3)
+                LocalDate.of(2026, 3, 3),
+                ""
         ));
 
         ticketJpaRepository.save(new TicketEntity(
                 "MVP-03",
                 "Ноут гріється",
                 "У мене Lenovo Legion 5. Десь місяць тому почав показувати температури в деяких, не у всіх іграх - 100 градусів. Допомогло вимкнення турбобуст, але це ж не вирішує проблему. Прошу замінити термопасту, і глянути до термопрокладок",
-                LocalDate.of(2026, 1, 1)
+                LocalDate.of(2026, 1, 1),
+                ""
         ));
 
 
@@ -48,7 +51,8 @@ public class DataInitializer implements CommandLineRunner {
                 "MVP-04",
                 "Ноут гріється",
                 "Після заміни термопасти пройшло 3 дні іноут знову почав грітись.... Точно термопрокладки. Допоможіть...",
-                LocalDate.of(2026, 1, 15)
+                LocalDate.of(2026, 1, 15),
+                ""
         ));
 
 
@@ -56,7 +60,8 @@ public class DataInitializer implements CommandLineRunner {
                 "MVP-05",
                 "Допоможіть",
                 "Монітор по різному відображає текст у Windows і у Linux. Я звик до Windows, а коли заходжу з-під Лінус то бачу більш грубий текст...",
-                LocalDate.of(2026, 3, 10)
+                LocalDate.of(2026, 3, 10),
+                ""
         ));
 
 
@@ -64,7 +69,8 @@ public class DataInitializer implements CommandLineRunner {
                 "MVP-06",
                 "Крадіжка",
                 "Віддав ноут на заміну термопасти. Так виконавці просто зникли. Ноут вкрали. Немає. Допоможіть...",
-                LocalDate.of(2026, 4, 10)
+                LocalDate.of(2026, 4, 10),
+                ""
         ));
 
 
@@ -72,7 +78,8 @@ public class DataInitializer implements CommandLineRunner {
                 "MVP-07",
                 "Вкрали... допоможіть",
                 "Legion 5 Lenovo. Крадіжка була здійснена вчора. Куди звертатись чи що робити?",
-                LocalDate.of(2026, 4, 10)
+                LocalDate.of(2026, 4, 10),
+                ""
         ));
 
 
@@ -80,7 +87,8 @@ public class DataInitializer implements CommandLineRunner {
                 "MVP-08",
                 "Новий ноут",
                 "Хочу перейти з поточного Lenogo Legion 5 з RTX 2060 на щось краще і сучасніше. В мене монітор Full HD. Очікую приріт продуктивності мінімум на 50%. Ну і крім того я не можу використати потенціал мого монітора (він може видати 200 ГЦ)",
-                LocalDate.of(2026, 4, 11)
+                LocalDate.of(2026, 4, 11),
+                ""
         ));
 
 
@@ -88,7 +96,8 @@ public class DataInitializer implements CommandLineRunner {
                 "MVP-09",
                 "Новий ноут ai",
                 "Хочу собі якийсь Lenovo Legion під мій монітор Full HD 200 ГЦ. Порадьте будь ласка. Хочу відчути аі сучасне",
-                LocalDate.of(2026, 4, 11)
+                LocalDate.of(2026, 4, 11),
+                ""
         ));
 
 
@@ -96,7 +105,8 @@ public class DataInitializer implements CommandLineRunner {
                 "MVP-10",
                 "Апгрейд ноута sql",
                 "Чи можна зробити якісь апрейди для мого ноута? Lenovo Legion. Процесор AMD Rysen 7. Хочу приріст FPS під Full HD. Бажано без AI",
-                LocalDate.of(2026, 4, 11)
+                LocalDate.of(2026, 4, 11),
+                ""
         ));
 
 
@@ -104,7 +114,8 @@ public class DataInitializer implements CommandLineRunner {
                 "MVP-11",
                 "Ноут тупить crm",
                 "Раніше було 200 FPS в CS2, зараз 50. Є підозра що використовується інтегрована відеокарта, а не дискретна. Lenovo Legion 7 FY9790",
-                LocalDate.of(2026, 4, 11)
+                LocalDate.of(2026, 4, 11),
+                ""
         ));
     }
 }

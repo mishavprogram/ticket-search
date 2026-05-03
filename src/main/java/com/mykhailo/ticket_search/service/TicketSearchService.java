@@ -17,6 +17,7 @@ import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.BoostQuery;
 import org.apache.lucene.search.FuzzyQuery;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.PrefixQuery;
@@ -39,6 +40,7 @@ public class TicketSearchService {
     private static final String FIELD_TITLE = "title";
     private static final String FIELD_DESCRIPTION = "description";
     private static final String FIELD_CLOSED_DATE = "closedDate";
+    private static final String FIELD_IMPORTANT = "importantWords";
 
     private final TicketRepository ticketRepository;
     private final AllowedShortWordsProvider allowedShortWordsProvider;
@@ -109,7 +111,8 @@ public class TicketSearchService {
                     doc.get(FIELD_NUMBER),
                     doc.get(FIELD_TITLE),
                     doc.get(FIELD_DESCRIPTION),
-                    LocalDate.parse(doc.get(FIELD_CLOSED_DATE))
+                    LocalDate.parse(doc.get(FIELD_CLOSED_DATE)),
+                    doc.get(FIELD_IMPORTANT)
             );
 
             foundTickets.add(new TicketSearchResult(ticket, scoreDoc.score));
@@ -150,23 +153,48 @@ public class TicketSearchService {
             // 🔹 Regular words
             if (normalized.length() >= settings.minWordLength()) {
 
+                // TITLE
                 queryBuilder.add(
-                        new PrefixQuery(new Term(FIELD_TITLE, normalized)),
+                        new BoostQuery(
+                                new PrefixQuery(new Term(FIELD_TITLE, normalized)),
+                                2.0f
+                        ),
                         BooleanClause.Occur.SHOULD
                 );
 
+                queryBuilder.add(
+                        new BoostQuery(
+                                new FuzzyQuery(new Term(FIELD_TITLE, normalized), settings.maxEdits()),
+                                1.5f
+                        ),
+                        BooleanClause.Occur.SHOULD
+                );
+
+                // DESCRIPTION
                 queryBuilder.add(
                         new PrefixQuery(new Term(FIELD_DESCRIPTION, normalized)),
                         BooleanClause.Occur.SHOULD
                 );
 
                 queryBuilder.add(
-                        new FuzzyQuery(new Term(FIELD_TITLE, normalized), settings.maxEdits()),
+                        new FuzzyQuery(new Term(FIELD_DESCRIPTION, normalized), settings.maxEdits()),
+                        BooleanClause.Occur.SHOULD
+                );
+
+                // IMPORTANT WORDS (strongest)
+                queryBuilder.add(
+                        new BoostQuery(
+                                new PrefixQuery(new Term(FIELD_IMPORTANT, normalized)),
+                                3.0f
+                        ),
                         BooleanClause.Occur.SHOULD
                 );
 
                 queryBuilder.add(
-                        new FuzzyQuery(new Term(FIELD_DESCRIPTION, normalized), settings.maxEdits()),
+                        new BoostQuery(
+                                new FuzzyQuery(new Term(FIELD_IMPORTANT, normalized), settings.maxEdits()),
+                                3.0f
+                        ),
                         BooleanClause.Occur.SHOULD
                 );
             }
@@ -181,6 +209,11 @@ public class TicketSearchService {
                 doc.add(new StringField(FIELD_NUMBER, ticket.number(), Field.Store.YES));
                 doc.add(new TextField(FIELD_TITLE, ticket.title(), Field.Store.YES));
                 doc.add(new TextField(FIELD_DESCRIPTION, ticket.description(), Field.Store.YES));
+                doc.add(new TextField(
+                        FIELD_IMPORTANT,
+                        ticket.importantWords() != null ? ticket.importantWords() : "",
+                        Field.Store.YES
+                ));
                 doc.add(new StringField(FIELD_CLOSED_DATE, ticket.closedDate().toString(), Field.Store.YES));
 
                 writer.addDocument(doc);

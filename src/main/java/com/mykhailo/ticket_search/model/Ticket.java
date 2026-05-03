@@ -6,6 +6,7 @@ public record Ticket(
         String number,
         String title,
         String description,
-        LocalDate closedDate
+        LocalDate closedDate,
+        String importantWords
 ) {
 }

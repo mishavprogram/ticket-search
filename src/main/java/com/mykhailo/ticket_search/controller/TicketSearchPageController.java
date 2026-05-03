@@ -74,7 +74,8 @@ public class TicketSearchPageController {
             @RequestParam String number,
             @RequestParam String title,
             @RequestParam String description,
-            @RequestParam LocalDate closedDate
+            @RequestParam LocalDate closedDate,
+            @RequestParam(required = false) String importantWords
     ) {
         if (ticketJpaRepository.existsByNumber(number)) {
             return "redirect:/add-ticket?error=duplicate";
@@ -84,7 +85,8 @@ public class TicketSearchPageController {
                 number,
                 title,
                 description,
-                closedDate
+                closedDate,
+                importantWords != null ? importantWords : ""
         ));
 
         return "redirect:/add-ticket?success=true";

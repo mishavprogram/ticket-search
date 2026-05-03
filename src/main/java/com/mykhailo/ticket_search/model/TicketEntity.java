@@ -28,14 +28,17 @@ public class TicketEntity {
 
     private LocalDate closedDate;//TODO think if I need unclosed tickets in system
 
+    private String importantWords;
+
     public TicketEntity() {
     }
 
-    public TicketEntity(String number, String title, String description, LocalDate closedDate) {
+    public TicketEntity(String number, String title, String description, LocalDate closedDate, String importantWords) {
         this.number = number;
         this.title = title;
         this.description = description;
         this.closedDate = closedDate;
+        this.importantWords = importantWords;
     }
 
     public Long getId() {
@@ -56,6 +59,10 @@ public class TicketEntity {
 
     public LocalDate getClosedDate() {
         return closedDate;
+    }
+
+    public String getImportantWords() {
+        return importantWords;
     }
 
     @Override

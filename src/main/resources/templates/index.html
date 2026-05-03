@@ -127,6 +127,11 @@
                 <p class="ticket-description"
                    th:text="${r.result.ticket.description}"></p>
 
+                <p th:if="${r.result.ticket.importantWords != null and !r.result.ticket.importantWords.isBlank()}">
+                    <b>Important words:</b>
+                    <span th:text="${r.result.ticket.importantWords}"></span>
+                </p>
+
                 <p>Score: <span th:text="${r.result.score}"></span></p>
 
                 <hr/>

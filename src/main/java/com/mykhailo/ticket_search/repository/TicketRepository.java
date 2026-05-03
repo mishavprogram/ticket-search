@@ -27,7 +27,8 @@ public class TicketRepository {
                 entity.getNumber(),
                 entity.getTitle(),
                 entity.getDescription(),
-                entity.getClosedDate()
+                entity.getClosedDate(),
+                entity.getImportantWords()
         );
     }
 }

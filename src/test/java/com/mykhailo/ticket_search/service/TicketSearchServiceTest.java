@@ -132,7 +132,8 @@ class TicketSearchServiceTest {
                 number,
                 title,
                 description,
-                LocalDate.of(2026, 1, 1)
+                LocalDate.of(2026, 1, 1),
+                ""
         ));
     }
 }
