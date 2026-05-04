@@ -142,4 +142,23 @@ class TicketSearchServiceTest {
                 ""
         ));
     }
+
+    @Test
+    void shouldFindByImportantWordsOnly() throws Exception {
+        ticketJpaRepository.save(new TicketEntity(
+                "TEST-IMPORTANT",
+                "Без ключових слів",
+                "Опис без потрібного слова",
+                LocalDate.of(2026, 1, 1),
+                "сімба"
+        ));
+
+        List<TicketSearchResult> results = ticketSearchService.search(
+                "сімба",
+                SearchSettings.defaultSettings()
+        );
+
+        assertFalse(results.isEmpty());
+        assertEquals("TEST-IMPORTANT", results.get(0).ticket().number());
+    }
 }
