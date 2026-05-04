@@ -73,6 +73,10 @@ public class TicketSearchService {
 
             String[] words = text.toLowerCase().split("\\s+");
 
+            if (!hasSearchableWords(words, settings)) {
+                return List.of();
+            }
+
             buildSearchQuery(words, queryBuilder, settings);
 
             Query query = queryBuilder.build();
@@ -217,6 +221,26 @@ public class TicketSearchService {
                     BooleanClause.Occur.SHOULD
             );
         }
+    }
+
+    private boolean hasSearchableWords(String[] words, SearchSettings settings) {
+        for (String word : words) {
+            String normalized = word.toLowerCase();
+
+            if (normalized.isBlank()) {
+                continue;
+            }
+
+            boolean isAllowedShortWord = allowedShortWordsProvider
+                    .getAllowedShortWords()
+                    .contains(normalized);
+
+            if (normalized.length() >= settings.minWordLength() || isAllowedShortWord) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private void createIndex(ByteBuffersDirectory index, IndexWriterConfig config) throws IOException {
