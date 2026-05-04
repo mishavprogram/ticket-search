@@ -38,13 +38,21 @@ public class TicketSearchPageController {
             @RequestParam(defaultValue = "3") int minWordLength,
             @RequestParam(defaultValue = "0.0") float minScoreRatio,//TODO find correct default value
             @RequestParam(defaultValue = "") String originalWebSite,
+
+            @RequestParam(defaultValue = "3.0") float importantWordsBoost,
+            @RequestParam(defaultValue = "2.0") float titleBoost,
+            @RequestParam(defaultValue = "1.0") float descriptionBoost,
             Model model
     ) throws Exception {
         SearchSettings settings = SearchSettings.of(
                 maxResults,
                 maxEdits,
                 minWordLength,
-                minScoreRatio
+                minScoreRatio,
+
+                importantWordsBoost,
+                titleBoost,
+                descriptionBoost
         );
 
         List<TicketSearchResult> results = ticketSearchService.search(text, settings);

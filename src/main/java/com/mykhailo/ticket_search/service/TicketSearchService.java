@@ -135,15 +135,33 @@ public class TicketSearchService {
                     .getAllowedShortWords()
                     .contains(normalized);
 
-            // 🔹 short words
+            if (normalized.length() < settings.minWordLength() && !isAllowedShortWord) {
+                continue;
+            }
+
+            // 🔹 Allowed short words
             if (isAllowedShortWord) {
                 queryBuilder.add(
-                        new TermQuery(new Term(FIELD_TITLE, normalized)),
+                        new BoostQuery(
+                                new TermQuery(new Term(FIELD_TITLE, normalized)),
+                                settings.titleBoost()
+                        ),
                         BooleanClause.Occur.SHOULD
                 );
 
                 queryBuilder.add(
-                        new TermQuery(new Term(FIELD_DESCRIPTION, normalized)),
+                        new BoostQuery(
+                                new TermQuery(new Term(FIELD_DESCRIPTION, normalized)),
+                                settings.descriptionBoost()
+                        ),
+                        BooleanClause.Occur.SHOULD
+                );
+
+                queryBuilder.add(
+                        new BoostQuery(
+                                new TermQuery(new Term(FIELD_IMPORTANT, normalized)),
+                                settings.importantWordsBoost()
+                        ),
                         BooleanClause.Occur.SHOULD
                 );
 
@@ -151,53 +169,53 @@ public class TicketSearchService {
             }
 
             // 🔹 Regular words
-            if (normalized.length() >= settings.minWordLength()) {
+            queryBuilder.add(
+                    new BoostQuery(
+                            new PrefixQuery(new Term(FIELD_TITLE, normalized)),
+                            settings.titleBoost()
+                    ),
+                    BooleanClause.Occur.SHOULD
+            );
 
-                // TITLE
-                queryBuilder.add(
-                        new BoostQuery(
-                                new PrefixQuery(new Term(FIELD_TITLE, normalized)),
-                                2.0f
-                        ),
-                        BooleanClause.Occur.SHOULD
-                );
+            queryBuilder.add(
+                    new BoostQuery(
+                            new FuzzyQuery(new Term(FIELD_TITLE, normalized), settings.maxEdits()),
+                            settings.titleBoost()
+                    ),
+                    BooleanClause.Occur.SHOULD
+            );
 
-                queryBuilder.add(
-                        new BoostQuery(
-                                new FuzzyQuery(new Term(FIELD_TITLE, normalized), settings.maxEdits()),
-                                1.5f
-                        ),
-                        BooleanClause.Occur.SHOULD
-                );
+            queryBuilder.add(
+                    new BoostQuery(
+                            new PrefixQuery(new Term(FIELD_DESCRIPTION, normalized)),
+                            settings.descriptionBoost()
+                    ),
+                    BooleanClause.Occur.SHOULD
+            );
 
-                // DESCRIPTION
-                queryBuilder.add(
-                        new PrefixQuery(new Term(FIELD_DESCRIPTION, normalized)),
-                        BooleanClause.Occur.SHOULD
-                );
+            queryBuilder.add(
+                    new BoostQuery(
+                            new FuzzyQuery(new Term(FIELD_DESCRIPTION, normalized), settings.maxEdits()),
+                            settings.descriptionBoost()
+                    ),
+                    BooleanClause.Occur.SHOULD
+            );
 
-                queryBuilder.add(
-                        new FuzzyQuery(new Term(FIELD_DESCRIPTION, normalized), settings.maxEdits()),
-                        BooleanClause.Occur.SHOULD
-                );
+            queryBuilder.add(
+                    new BoostQuery(
+                            new PrefixQuery(new Term(FIELD_IMPORTANT, normalized)),
+                            settings.importantWordsBoost()
+                    ),
+                    BooleanClause.Occur.SHOULD
+            );
 
-                // IMPORTANT WORDS (strongest)
-                queryBuilder.add(
-                        new BoostQuery(
-                                new PrefixQuery(new Term(FIELD_IMPORTANT, normalized)),
-                                3.0f
-                        ),
-                        BooleanClause.Occur.SHOULD
-                );
-
-                queryBuilder.add(
-                        new BoostQuery(
-                                new FuzzyQuery(new Term(FIELD_IMPORTANT, normalized), settings.maxEdits()),
-                                3.0f
-                        ),
-                        BooleanClause.Occur.SHOULD
-                );
-            }
+            queryBuilder.add(
+                    new BoostQuery(
+                            new FuzzyQuery(new Term(FIELD_IMPORTANT, normalized), settings.maxEdits()),
+                            settings.importantWordsBoost()
+                    ),
+                    BooleanClause.Occur.SHOULD
+            );
         }
     }
 

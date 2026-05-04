@@ -86,7 +86,10 @@ class TicketSearchServiceTest {
                 1,
                 2,
                 3,
-                0.0f
+                0.0f,
+                3,
+                2,
+                1
         );
 
         List<TicketSearchResult> results = ticketSearchService.search(
@@ -115,7 +118,10 @@ class TicketSearchServiceTest {
                 5,
                 2,
                 3,
-                0.5f
+                0.5f,
+                3,
+                2,
+                1
         );
 
         List<TicketSearchResult> results = ticketSearchService.search(

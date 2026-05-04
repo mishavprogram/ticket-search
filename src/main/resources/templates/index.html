@@ -102,6 +102,28 @@
                th:value="${settings != null ? settings.minScoreRatio : 0.0}"
                min="0" max="1"/>
 
+        <br><br>
+
+        <label>Important words boost:</label>
+        <input type="number" step="0.1" name="importantWordsBoost"
+               th:value="${settings != null ? settings.importantWordsBoost : 3.0}"
+               min="0.1" max="10"/>
+
+        <label>Title boost:</label>
+        <input type="number" step="0.1" name="titleBoost"
+               th:value="${settings != null ? settings.titleBoost : 2.0}"
+               min="0.1" max="10"/>
+
+        <label>Description boost:</label>
+        <input type="number" step="0.1" name="descriptionBoost"
+               th:value="${settings != null ? settings.descriptionBoost : 1.0}"
+               min="0.1" max="10"/>
+
+        <p style="font-size: 13px; color: #555;">
+            Higher boost means stronger influence on ranking.
+            Recommended: important words > title > description.
+        </p>
+
         <button type="submit">Search</button>
     </form>
 
