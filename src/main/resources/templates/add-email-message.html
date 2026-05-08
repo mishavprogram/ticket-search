@@ -65,16 +65,18 @@
     </p>
 
     <form action="/add-email-message" method="post">
-        <label>Email ID:</label>
+        <label>Email number for this day:</label>
+        <input type="number" id="emailNumberForDay" min="1" value="1" required/>
+
+        <label>Generated Email ID:</label>
         <p style="font-size: 13px; color: #555; margin-top: 4px;">
-            Use format: EMAIL-DD.MM.YYYY-N. Use the email date shown in Gmail.
-            N is your own number for emails from the same day.
-            Example: EMAIL-06.03.2026-1.
+            Generated from email date + your daily number.
         </p>
         <input type="text"
+               id="generatedEmailId"
                name="number"
                required
-               placeholder="EMAIL-06.03.2026-1"/>
+               readonly/>
 
         <label>Subject:</label>
         <input type="text" name="title" required placeholder="Email subject"/>
@@ -104,4 +106,31 @@
 </div>
 
 </body>
+
+<script>
+    function updateGeneratedEmailId() {
+        const dateInput = document.querySelector('input[name="closedDate"]');
+        const numberInput = document.getElementById('emailNumberForDay');
+        const generatedInput = document.getElementById('generatedEmailId');
+
+        if (!dateInput.value || !numberInput.value) {
+            generatedInput.value = "";
+            return;
+        }
+
+        const parts = dateInput.value.split("-");
+        const formattedDate = parts[2] + "." + parts[1] + "." + parts[0];
+
+        generatedInput.value = "EMAIL-" + formattedDate + "-" + numberInput.value;
+    }
+
+    document.querySelector('input[name="closedDate"]')
+        .addEventListener("change", updateGeneratedEmailId);
+
+    document.getElementById("emailNumberForDay")
+        .addEventListener("input", updateGeneratedEmailId);
+
+    updateGeneratedEmailId();
+</script>
+
 </html>
