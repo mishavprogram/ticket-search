@@ -27,7 +27,7 @@ public class TicketSearchPageController {
 
     @GetMapping("/")
     public String home() {
-        return "index";
+        return "home";
     }
 
     @GetMapping("/search-ui")
