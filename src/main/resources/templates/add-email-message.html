@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Add Ticket</title>
+    <title>Add Email Message</title>
 
     <style>
         body {
@@ -49,36 +49,39 @@
 
 <div class="container">
 
-    <h2>Add ticket</h2>
+    <h2>Add email message</h2>
 
     <p style="font-size: 13px; color: #555;">
         Important words have the highest priority in search.
-        Use short, meaningful keywords.
+        Use short, meaningful keywords
     </p>
 
     <p style="color: red;" th:if="${param.error != null}">
-        Ticket with this number already exists.
+        Email message with this ID already exists.
     </p>
 
     <p style="color: green;" th:if="${param.success != null}">
-        Ticket added successfully.
+        Email message added successfully.
     </p>
 
-    <form action="/add-ticket" method="post">
-        <label>Ticket number:</label>
-        <input type="text" name="number" required placeholder="Наприклад: 42049"/>
+    <form action="/add-email-message" method="post">
+        <label>Email ID:</label>
+        <input type="text" name="number" required placeholder="Наприклад: EMAIL-20260512-001"/>
 
-        <label>Title:</label>
-        <input type="text" name="title" required placeholder="Коротка назва тікета"/>
+        <label>Subject:</label>
+        <input type="text" name="title" required placeholder="Email subject"/>
 
-        <label>Description:</label>
-        <textarea name="description" required placeholder="Текст звернення..." rows="10"></textarea>
+        <label>Important text from email:</label>
+        <textarea name="description"
+                  required
+                  placeholder="Main useful text from email..."
+                  rows="10"></textarea>
 
         <label>Important words / keywords:</label>
         <input type="text" name="importantWords"
                placeholder="Наприклад: keyword1 keyword2 keyword3"/>
 
-        <label>Closed date:</label>
+        <label>Email date:</label>
         <p style="font-size: 13px; color: #555; margin-top: 4px;">
             I copy this from date format: DD.MM.YYYY. My field uses: YYYY-MM-DD.
         </p>

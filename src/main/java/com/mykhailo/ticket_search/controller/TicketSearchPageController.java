@@ -100,6 +100,34 @@ public class TicketSearchPageController {
         return "redirect:/add-ticket?success=true";
     }
 
+    @GetMapping("/add-email-message")
+    public String addEmailMessagePage() {
+        return "add-email-message";
+    }
+
+    @PostMapping("/add-email-message")
+    public String addEmailMessage(
+            @RequestParam String number,
+            @RequestParam String title,
+            @RequestParam String description,
+            @RequestParam LocalDate closedDate,
+            @RequestParam(required = false) String importantWords
+    ) {
+        if (ticketJpaRepository.existsByNumber(number)) {
+            return "redirect:/add-email-message?error=duplicate";
+        }
+
+        ticketJpaRepository.save(new TicketEntity(
+                number,
+                title,
+                description,
+                closedDate,
+                importantWords != null ? importantWords : ""
+        ));
+
+        return "redirect:/add-email-message?success=true";
+    }
+
     private String buildTicketUrl(String originalWebSite, String number) {
         if (originalWebSite == null || originalWebSite.isBlank()) {
             return "";
