@@ -163,6 +163,41 @@ class TicketSearchServiceTest {
     }
 
     @Test
+    void shouldFindByEnglishImportantWordsWhenTicketTextIsNotEnglish() throws Exception {
+        ticketJpaRepository.save(new TicketEntity(
+                "TEST-ALPHA",
+                "Не працює сторінка",
+                "Користувач бачить помилку",
+                LocalDate.of(2026, 1, 1),
+                "alpha portal access"
+        ));
+
+        ticketJpaRepository.save(new TicketEntity(
+                "TEST-BETA",
+                "Проблема з оплатою",
+                "Система повертає помилку",
+                LocalDate.of(2026, 1, 1),
+                "beta transaction payment"
+        ));
+
+        List<TicketSearchResult> alphaResults = ticketSearchService.search(
+                "alpha portal",
+                SearchSettings.defaultSettings()
+        );
+
+        assertFalse(alphaResults.isEmpty());
+        assertEquals("TEST-ALPHA", alphaResults.get(0).ticket().number());
+
+        List<TicketSearchResult> betaResults = ticketSearchService.search(
+                "payment",
+                SearchSettings.defaultSettings()
+        );
+
+        assertFalse(betaResults.isEmpty());
+        assertEquals("TEST-BETA", betaResults.get(0).ticket().number());
+    }
+
+    @Test
     void shouldFindByAllowedShortWordShorterThanMinWordLength() throws Exception {
         saveTicket(
                 "TEST-TT",
