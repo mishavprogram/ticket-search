@@ -161,4 +161,21 @@ class TicketSearchServiceTest {
         assertFalse(results.isEmpty());
         assertEquals("TEST-IMPORTANT", results.get(0).ticket().number());
     }
+
+    @Test
+    void shouldFindByAllowedShortWordShorterThanMinWordLength() throws Exception {
+        saveTicket(
+                "TEST-TT",
+                "Problem in TT",
+                "User cannot open TT page"
+        );
+
+        List<TicketSearchResult> results = ticketSearchService.search(
+                "tt",
+                SearchSettings.defaultSettings()
+        );
+
+        assertFalse(results.isEmpty());
+        assertEquals("TEST-TT", results.get(0).ticket().number());
+    }
 }
