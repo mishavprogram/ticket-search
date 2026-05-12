@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -98,6 +99,50 @@ public class TicketSearchPageController {
         ));
 
         return "redirect:/add-ticket?success=true";
+    }
+
+    @GetMapping("/tickets/{number}/edit")
+    public String editTicketPage(
+            @PathVariable String number,
+            Model model
+    ) {
+        TicketEntity ticket = ticketJpaRepository.findByNumber(number)
+                .orElseThrow();
+
+        model.addAttribute("ticket", ticket);
+
+        return "edit-ticket";
+    }
+
+    @GetMapping("/tickets/missing-important-words")
+    public String ticketsMissingImportantWords(Model model) {
+
+        List<TicketEntity> tickets = ticketJpaRepository.findAll().stream()
+                .filter(ticket ->
+                        ticket.getImportantWords() == null//TODO maybe we dont need null and blank check in future
+                                || ticket.getImportantWords().isBlank()
+                )
+                .toList();
+
+        model.addAttribute("tickets", tickets);
+
+        return "tickets-missing-important-words";
+    }
+
+    @PostMapping("/tickets/{number}/edit")
+    public String updateImportantWords(
+            @PathVariable String number,
+            @RequestParam String importantWords
+    ) {
+
+        TicketEntity ticket = ticketJpaRepository.findByNumber(number)
+                .orElseThrow();
+
+        ticket.setImportantWords(importantWords);
+
+        ticketJpaRepository.save(ticket);
+
+        return "redirect:/tickets/missing-important-words";
     }
 
     @GetMapping("/add-email-message")

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tickets missing important words</title>
+</head>
+<body>
+
+<div class="header">
+    Created by Mykhailo Vinnichuk (personal tool)
+</div>
+
+<h1>Tickets missing important words</h1>
+
+<table border="1" cellpadding="6">
+    <tr>
+        <th>Number</th>
+        <th>Title</th>
+        <th>Action</th>
+    </tr>
+
+    <tr th:each="ticket : ${tickets}">
+        <td th:text="${ticket.number}"></td>
+        <td th:text="${ticket.title}"></td>
+        <td>
+            <a th:href="@{/tickets/{number}/edit(number=${ticket.number})}">
+                Edit
+            </a>
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>

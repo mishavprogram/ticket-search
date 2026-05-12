@@ -65,6 +65,10 @@ public class TicketEntity {
         return importantWords;
     }
 
+    public void setImportantWords(String importantWords) {
+        this.importantWords = importantWords;
+    }
+
     @Override
     public String toString() {
         return "TicketEntity{" +

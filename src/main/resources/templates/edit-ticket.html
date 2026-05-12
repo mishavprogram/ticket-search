@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit important words</title>
+</head>
+<body>
+
+<div class="header">
+    Created by Mykhailo Vinnichuk (personal tool)
+</div>
+
+<h1>Edit important words</h1>
+
+<p>
+    <b>Ticket:</b>
+    <span th:text="${ticket.number}"></span>
+</p>
+
+<p>
+    <b>Title:</b>
+    <span th:text="${ticket.title}"></span>
+</p>
+
+<form method="post"
+      th:action="@{/tickets/{number}/edit(number=${ticket.number})}">
+
+    <label for="importantWords">Important words:</label>
+    <br>
+
+    <textarea id="importantWords"
+              name="importantWords"
+              rows="4"
+              cols="80"
+              th:text="${ticket.importantWords}"></textarea>
+
+    <br><br>
+
+    <button type="submit">Save</button>
+</form>
+
+</body>
+</html>

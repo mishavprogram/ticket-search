@@ -14,6 +14,8 @@ Current features:
 - Generated email IDs
 - Home navigation page
 - Lucene search across title, description, importantWords
+- Page for tickets missing importantWords
+- Edit page for updating only importantWords
 
 Search behavior:
 - importantWords has highest priority
@@ -29,7 +31,7 @@ Search behavior:
 Current priorities:
 1. Stabilize workflow
 2. Keywords cleanup
-3. Edit page for keywords
+3. Improve keyword enrichment workflow
 4. Later: video transcript MVP
 5. Consider diagnostic page for allowed-short-words.txt usage:
    show which allowed short words are present in current DB data and which are unused.
@@ -38,6 +40,12 @@ Notes:
 - allowed-short-words.txt is mainly intended for abbreviations, system names, and short technical/domain terms
 - allowed-short-words.txt is mainly useful for words shorter than minWordLength
 - words with length >= minWordLength are usually redundant in this file
+- Refactor TicketSearchService query-building duplication later
+- Current controller may directly use TicketJpaRepository for simple MVP workflows
+- Later consider TicketManagementService to keep controller -> service -> repository structure
+- Future safety improvements:
+  sanitize originalWebSite URLs, improve highlight rendering safety, handle duplicate-save exceptions
+- Later consider Lombok for reducing boilerplate getters/setters/constructors
 
 Principles:
 - Keep UX simple
