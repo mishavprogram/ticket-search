@@ -21,6 +21,15 @@
     <span th:text="${ticket.title}"></span>
 </p>
 
+<p>
+    <b>Description:</b>
+</p>
+
+<div style="border:1px solid #ccc; padding:10px; margin-bottom:15px;">
+    <pre th:text="${ticket.description}"
+         style="white-space: pre-wrap;"></pre>
+</div>
+
 <form method="post"
       th:action="@{/tickets/{number}/edit(number=${ticket.number})}">
 
