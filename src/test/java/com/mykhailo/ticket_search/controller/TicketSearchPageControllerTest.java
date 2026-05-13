@@ -62,7 +62,8 @@ class TicketSearchPageControllerTest {
 
     @Test
     void shouldOpenTicketsMissingImportantWordsPage() throws Exception {
-        mockMvc.perform(get("/tickets/missing-important-words"))
+        mockMvc.perform(get("/tickets/missing-important-words")
+                        .param("originalWebSite", "https://example.com/ticket/"))
                 .andExpect(status().isOk());
     }
 

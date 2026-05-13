@@ -11,16 +11,38 @@
 
 <h1>Tickets missing important words</h1>
 
+<form method="get" action="/tickets/missing-important-words">
+    <label for="originalWebSite">Original website prefix:</label>
+    <input id="originalWebSite"
+           name="originalWebSite"
+           type="text"
+           size="60"
+           th:value="${originalWebSite}">
+    <button type="submit">Apply</button>
+</form>
+
+<br>
+
 <table border="1" cellpadding="6">
     <tr>
         <th>Number</th>
         <th>Title</th>
+        <th>Description</th>
         <th>Action</th>
     </tr>
 
     <tr th:each="ticket : ${tickets}">
-        <td th:text="${ticket.number}"></td>
+        <td>
+            <a th:if="${originalWebSite != null and !originalWebSite.isBlank()}"
+               th:href="${originalWebSite + ticket.number}"
+               th:text="${ticket.number}"
+               target="_blank"></a>
+
+            <span th:if="${originalWebSite == null or originalWebSite.isBlank()}"
+                  th:text="${ticket.number}"></span>
+        </td>
         <td th:text="${ticket.title}"></td>
+        <td th:text="${ticket.description}"></td>
         <td>
             <a th:href="@{/tickets/{number}/edit(number=${ticket.number})}">
                 Edit

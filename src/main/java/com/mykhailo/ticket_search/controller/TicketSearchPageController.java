@@ -8,9 +8,9 @@ import com.mykhailo.ticket_search.service.TicketSearchService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -115,7 +115,7 @@ public class TicketSearchPageController {
     }
 
     @GetMapping("/tickets/missing-important-words")
-    public String ticketsMissingImportantWords(Model model) {
+    public String ticketsMissingImportantWords(Model model, @RequestParam(defaultValue = "") String originalWebSite) {
 
         List<TicketEntity> tickets = ticketJpaRepository.findAll().stream()
                 .filter(ticket ->
@@ -125,6 +125,7 @@ public class TicketSearchPageController {
                 .toList();
 
         model.addAttribute("tickets", tickets);
+        model.addAttribute("originalWebSite", originalWebSite);
 
         return "tickets-missing-important-words";
     }
