@@ -104,12 +104,14 @@ public class TicketSearchPageController {
     @GetMapping("/tickets/{number}/edit")
     public String editTicketPage(
             @PathVariable String number,
+            @RequestParam(defaultValue = "") String originalWebSite,
             Model model
     ) {
         TicketEntity ticket = ticketJpaRepository.findByNumber(number)
                 .orElseThrow();
 
         model.addAttribute("ticket", ticket);
+        model.addAttribute("originalWebSite", originalWebSite);
 
         return "edit-ticket";
     }
@@ -133,7 +135,8 @@ public class TicketSearchPageController {
     @PostMapping("/tickets/{number}/edit")
     public String updateImportantWords(
             @PathVariable String number,
-            @RequestParam String importantWords
+            @RequestParam String importantWords,
+            @RequestParam(defaultValue = "") String originalWebSite
     ) {
 
         TicketEntity ticket = ticketJpaRepository.findByNumber(number)
@@ -143,7 +146,7 @@ public class TicketSearchPageController {
 
         ticketJpaRepository.save(ticket);
 
-        return "redirect:/tickets/missing-important-words";
+        return "redirect:/tickets/missing-important-words?originalWebSite=" + originalWebSite;
     }
 
     @GetMapping("/add-email-message")

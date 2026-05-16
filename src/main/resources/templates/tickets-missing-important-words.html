@@ -26,9 +26,9 @@
 <table border="1" cellpadding="6">
     <tr>
         <th>Number</th>
+        <th>Action</th>
         <th>Title</th>
         <th>Description</th>
-        <th>Action</th>
     </tr>
 
     <tr th:each="ticket : ${tickets}">
@@ -41,13 +41,19 @@
             <span th:if="${originalWebSite == null or originalWebSite.isBlank()}"
                   th:text="${ticket.number}"></span>
         </td>
-        <td th:text="${ticket.title}"></td>
-        <td th:text="${ticket.description}"></td>
+
         <td>
-            <a th:href="@{/tickets/{number}/edit(number=${ticket.number})}">
+            <a th:href="@{/tickets/{number}/edit(
+                    number=${ticket.number},
+                    originalWebSite=${originalWebSite}
+                )}">
                 Edit
             </a>
         </td>
+
+        <td th:text="${ticket.title}"></td>
+
+        <td th:text="${ticket.description}"></td>
     </tr>
 </table>
 
